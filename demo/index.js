@@ -12,4 +12,5 @@ const fs = require('fs');
 // fs.readFile
 // console.log(data);
 // console.log();
+// to create folder
 fs.mkdirSync('Hello');
