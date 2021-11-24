@@ -8,7 +8,11 @@ mongoose.connect("mongodb://localhost:27017/fruitsDB", { useNewUrlParser: true, 
 const fruitSchema = new mongoose.Schema({
     name: {
         type: String,
-        required: true
+        required: true,
+        lowercase:true,
+        trim:true,
+        minlength:[3,"Minimum 3 letter"],
+        maxlength:[30, "Max Length is 30"]
     },
     rating: Number,
     review: String,
@@ -23,9 +27,9 @@ const Fruit = mongoose.model("Fruit", fruitSchema);
     const creatFun = async () => {
         try {
         const fruit = new Fruit({
-            name: "Mango",
-            rating: 7,
-            review: "Nice"
+            name: "PineApple",
+            rating: 8.5,
+            review: "sour"
         })
 
         const result = await fruit.save();
