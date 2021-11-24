@@ -22,7 +22,11 @@ const Fruit = mongoose.model("Fruit", fruitSchema);
 
     const ReadFun = async () => {
         try { 
-        const result = await Fruit.find({name : "Apple"}).select({name:1});
+        // const result = await Fruit.find({rating : {$lt:7}}).select({name:1});
+        // UpdateQuery
+        // const result = await Fruit.updateOne({_id:"619cda65e061180167c3b403"},{$set:{name:"KelaGang"}});
+        // Delete document
+        const result = await Fruit.deleteOne({_id:"619cde14e5d25f518915d600"});
         console.log(result);
     } catch (err) {
         console.log(err);
