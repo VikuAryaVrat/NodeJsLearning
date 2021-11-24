@@ -1,4 +1,5 @@
 const mongoose = require('mongoose');
+const validator = require('validator');
 
 
 mongoose.connect("mongodb://localhost:27017/fruitsDB", { useNewUrlParser: true, useUnifiedTopology: true, })
@@ -16,23 +17,32 @@ const fruitSchema = new mongoose.Schema({
     },
     rating: {
         type: Number,
-        // validate(value){
-        //     if(value < 0){
-        //         throw new Error("Rating not in negative");
-        //     }
-        validate: {
-            validator: function (v) {
-                return v.length < 0
-            },
-            message: "Rating not in negative"
-            // }
+        validate(value) {
+            if (value < 0) {
+                throw new Error("Rating not in negative");
+            }
+            // validate: {
+            //     validator: function (v) {
+            //         return v.length < 0
+            //     },
+            //     message: "Rating not in negative"
+            //     }
         }
     },
-    review: String,
+    email: {
+        type: String,
+        required: true,
+        validate (value){
+    if(!validator.isEmail(value)){
+        throw new Error("Enter Valid Email");
+            }
+        }
+    },
+review: String,
     date: {
-        type: Date,
+    type: Date,
         default: Date.now
-    }
+}
 });
 
 const Fruit = mongoose.model("Fruit", fruitSchema);
@@ -40,9 +50,11 @@ const Fruit = mongoose.model("Fruit", fruitSchema);
 const creatFun = async () => {
     try {
         const fruit = new Fruit({
-            name: "RedApple",
-            rating: -9.5,
+            name: "BlackApple",
+            rating: 8.57,
+            email: "xyz@gmail.com",
             review: "sour"
+
         })
 
         const result = await fruit.save();
