@@ -42,7 +42,7 @@ app.post("/register",async(req,res)=>{
     })
         const reg = await reg1.save();
         console.log(reg);
-        //   res.status(200).send()
+          res.status(200).send("register");
         
     }catch(err){
         res.status(400).send(err);
