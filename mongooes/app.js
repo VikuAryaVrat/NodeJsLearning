@@ -40,7 +40,7 @@ const Fruit = mongoose.model("Fruit", fruitSchema);
 const creatFun = async () => {
     try {
         const fruit = new Fruit({
-            name: "RedApple",
+            name: "YellowApple",
             rating: -9.5,
             review: "sour"
         })

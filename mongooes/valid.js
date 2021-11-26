@@ -51,7 +51,7 @@ const creatFun = async () => {
     try {
         const fruit = new Fruit({
             name: "BlackApple",
-            rating: 8.57,
+            rating: -8.57,
             email: "xyz@gmail.com",
             review: "sour"
 

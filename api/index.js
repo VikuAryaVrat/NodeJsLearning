@@ -77,7 +77,6 @@ app.patch("/students/:id", async (req, res) => {
             console.log(updateData);
             res.status(200).send(updateData);
         }
-
     } catch (err) {
         res.status(400).send(err);
     }
