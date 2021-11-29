@@ -55,16 +55,19 @@ app.post("/login",async(req,res)=>{
     try{
       const email1 = req.body.email;
       const password = req.body.password;
-    
-        const userlogin = await Reg.findOne({email:email1});
-        console.log(userlogin); 
-        if(userlogin.password === password){
+
+      const userlogin = await Reg.findOne({email:email1});
+
+        console.log(userlogin);
+        const isMatch = await bcrypt.compare(password, userlogin.password); 
+        console.log(isMatch);
+        if(isMatch){
             res.status(202).send("Login Success"); 
         }else{
             res.status(404).send("Invalid details");
         }
     }catch(err){
-        res.status(400).send(err);
+        res.status(400).send("Invalid login Details");
     }
 });
 
