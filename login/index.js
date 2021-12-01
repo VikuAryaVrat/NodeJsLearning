@@ -1,19 +1,34 @@
+require('dotenv').config();
 const express = require('express');
 const path = require('path');
 const hbs = require('hbs');
 const bcrypt = require('bcryptjs');
 const bodyParser = require("body-parser");
-const port = process.env.PORT || 3000;
+var jwt = require('jsonwebtoken');
+
+const port = process.env.PORT || 4000;
 require("./db/conn");
 const Reg = require("./model/std");
+// var session = require('express-session');
+// const passport = require('passport');
+// const passportLocalMongoose = require('passport-local-mongoose');
 
 const app = express();
 
 
-const publicPath = path.join(__dirname,"./public");
+const publicPath = path.join(__dirname, "./public");
 const partials_path = path.join(__dirname, "/views/partials");
+console.log(process.env.SECRTE_KEY);
 app.use(express.json());
-app.use(bodyParser.urlencoded({extended: true}));
+app.use(bodyParser.urlencoded({ extended: true }));
+// app.use(session({
+//     secret: 'HelloGuyZ',
+//     resave: false,
+//     saveUninitialized: true,
+//     // cookie: { secure: true }
+// }));
+// app.use(passport.initialize());
+// app.use(passport.session());
 
 
 
@@ -22,61 +37,91 @@ app.use(express.static(publicPath));
 app.set("view engine", "hbs");
 hbs.registerPartials(partials_path);
 
-app.get("/",(req,res)=>{
+app.get("/", (req, res) => {
     res.render("index");
 });
-app.get("/login",(req,res)=>{
+app.get("/login", (req, res) => {
     res.render("login");
 });
-app.get("/register",(req,res)=>{
+app.get("/register", (req, res) => {
     res.render("register");
 });
-app.post("/register",async(req,res)=>{
-    try{
-
+app.get("/forgot",(req,res)=>{
+    res.render("forgot");
+});
+app.post("/register", async (req, res) => {
+    try {
         const reg1 = new Reg({
-      firstname :req.body.first_name,
-       email : req.body.email,
-       address : req.body.address,
-       phone : req.body.mobile,
-       password : req.body.password
-    })
-    // password hasing using bcrypt
+            firstname: req.body.first_name,
+            email: req.body.email,
+            address: req.body.address,
+            phone: req.body.mobile,
+            password: req.body.password
+        })
+console.log();
+     const token =await reg1.generateAuthToken();
+     console.log("token part" + token);
 
+        // password hasing using bcrypt
         const reg = await reg1.save();
         console.log(reg);
-          res.status(200).send("registration Successfull");    
-    }catch(err){
+        res.render("home");
+    } catch (err) {
         res.status(400).send(err);
     }
 });
 
-app.post("/login",async(req,res)=>{
-    try{
-      const email1 = req.body.email;
-      const password = req.body.password;
+app.post("/login", async (req, res) => {
+    try {
+        const email1 = req.body.email;
+        const password = req.body.password;
 
-      const userlogin = await Reg.findOne({email:email1});
+        const userlogin = await Reg.findOne({ email: email1 });
 
         console.log(userlogin);
-        const isMatch = await bcrypt.compare(password, userlogin.password); 
+        const isMatch = await bcrypt.compare(password, userlogin.password);
+
+        const token =await userlogin.generateAuthToken();
+        console.log("token part" + token);
+
         console.log(isMatch);
-        if(isMatch){
-            res.status(202).send("Login Success"); 
-        }else{
+        if (isMatch) {
+            res.status(202).render("home");
+        } else {
             res.status(404).send("Invalid details");
         }
-    }catch(err){
+    } catch (err) {
         res.status(400).send("Invalid login Details");
     }
 });
 
-app.get("*",(req,res)=>{
+app.post("/forgot",async(req,res)=>{
+    try {
+        console.log(req.body);
+        const email1 = req.body.email;
+        const password = req.body.password;
+        console.log("salo");
+        const passwordHash = await bcrypt.hash(password, 10);
+        console.log("bye");
+        const updateData = await Reg.findOneAndUpdate({email:email1},{$set:{password:passwordHash}},{new: true, useFindAndModify: true});
+        console.log("hi");
+        if (!updateData) {
+            return res.status(404).send();
+        } else {
+            console.log(updateData);
+            res.status(200).send("Password successfully changed");
+        }
+    } catch (err) {
+        res.status(400).send(err);
+    }
+});
+
+app.get("*", (req, res) => {
     res.render("404");
 })
 
 
 
-app.listen(port,()=>{
+app.listen(port, () => {
     console.log(`Server is running on ${port}`);
 })
