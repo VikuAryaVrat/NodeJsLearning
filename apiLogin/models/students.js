@@ -8,29 +8,36 @@ const studentSchema = new mongoose.Schema({
         required: true,
         minlength: [3, "Length shoulds be greater than 3 char"],
         maxlength: [30, "Inviled"],
-        lowercase: true
+        lowercase: true,
+        trim:true
     },
     email: {
         type: String,
         required: true,
         unique: true,
         sparse:true,
+        lowercase:true,
+        time:true,
         validate(value) {
             if (!validator.isEmail(value)) {
                 return new Error("Enter Valid Email");
             }
-        }
+        },
+        match: /^([a-zA-Z0-9])(([a-zA-Z0-9])*([\._\+-])*([a-zA-Z0-9]))*@(([a-zA-Z0-9\-])+(\.))+([a-zA-Z]{2,4})+$/,
     },
     mobile:{
         type:Number,
-        // minlength:10,
-        // maxlength:10,
-        match: /^\+?([0-9]{2})\)?[-. ]?([0-9]{4})[-. ]?([0-9]{4})$/,
+        minlength:[10,"Minimum length is 10 digit"],
+        maxlength:[10,"Maximum length is 10 digit"],
+        trim:true,
+        unique:true,
+        match: /^[6-9]\d{9}$/,
     },
     password:{
          type: String,
-         minlength:[6 , "Minimum Lenght is 6"],
-         maxlength:[16 , "Enter valid length Password"]
+        required:true,
+        trim:true,
+        match: /^(?=.*[0-9])(?=.*[!@#$%^&*])[a-zA-Z0-9!@#$%^&*]{6,60}$/
     },
     date:{
         type: Date,

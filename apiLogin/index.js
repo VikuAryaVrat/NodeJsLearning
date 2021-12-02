@@ -3,6 +3,7 @@ require("./db/conn.js");
 const Student = require("./models/students");
 const mongoose = require('mongoose');
 const router = require("./router/user");
+// const bcrypt = require('bcryptjs');
 const cors = require('cors');
 const port = process.env.PORT || 3000;
 
