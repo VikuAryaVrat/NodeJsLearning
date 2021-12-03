@@ -39,13 +39,14 @@ app.get("/login", (req, res) => {
 app.get("/register", (req, res) => {
     res.render("register");
 });
-app.get("/forgot",(req,res)=>{
+app.get("/forgot", (req, res) => {
     res.render("forgot");
 });
-app.get("/secret", auth, (req,res)=>{
+app.get("/secret", auth, (req, res) => {
     res.render("secret");
     // console.log(req.cookies.jwt);
-})
+});
+
 app.post("/register", async (req, res) => {
     try {
         const reg1 = new Reg({
@@ -55,18 +56,17 @@ app.post("/register", async (req, res) => {
             phone: req.body.mobile,
             password: req.body.password
         })
-console.log();
-     const token =await reg1.generateAuthToken();
-     console.log("token part" + token);
-
-        // cookies
-        res.cookie("jwt", token,{
-                expires: new Date(Date.now() + 30000),
-                httpOnly: true
+        console.log();
+        const token = await reg1.generateAuthToken();
+        console.log("token part" + token);
+        res.cookie("jwt", token, {
+            expires: new Date(Date.now() + 10000),
+            httpOnly: true
         });
+
         const reg = await reg1.save();
         console.log(reg);
-        res.render("home");
+        res.status(201).render("home");
     } catch (err) {
         res.status(400).send(err);
     }
@@ -82,19 +82,20 @@ app.post("/login", async (req, res) => {
         console.log(userlogin);
         const isMatch = await bcrypt.compare(password, userlogin.password);
 
-        const token =await userlogin.generateAuthToken();
+        const token = await userlogin.generateAuthToken();
         console.log("token part" + token);
-        
+
         // cookies
-         res.cookie("jwt", token, {
+        res.cookie("jwt", token, {
             expires: new Date(Date.now() + 300000),
             // secure:true,
             httpOnly: true
-    });
-    
+        });
+
+
         console.log(isMatch);
         if (isMatch) {
-            res.status(202).render("home");
+            res.status(201).render("home");
         } else {
             res.status(404).send("Invalid details");
         }
@@ -103,7 +104,22 @@ app.post("/login", async (req, res) => {
     }
 });
 
-app.post("/forgot",async(req,res)=>{
+app.get("/logout", auth, async (req, res) => {
+    try {
+        console.log(req.user);
+
+        req.user.tokens = req.user.tokens.filter((currElement) => {
+            return currElement.token == req.token;
+        });
+        res.clearCookie("jwt");
+        console.log("logout success");
+        await req.user.save();
+        res.render("login");
+    } catch (error) {
+        res.status(500).send(error);
+    }
+});
+app.post("/forgot", async (req, res) => {
     try {
         console.log(req.body);
         const email1 = req.body.email;
@@ -111,7 +127,7 @@ app.post("/forgot",async(req,res)=>{
         console.log("salo");
         const passwordHash = await bcrypt.hash(password, 10);
         console.log("bye");
-        const updateData = await Reg.findOneAndUpdate({email:email1},{$set:{password:passwordHash}},{new: true, useFindAndModify: true});
+        const updateData = await Reg.findOneAndUpdate({ email: email1 }, { $set: { password: passwordHash } }, { new: true, useFindAndModify: true });
         console.log("hi");
         if (!updateData) {
             return res.status(404).send();

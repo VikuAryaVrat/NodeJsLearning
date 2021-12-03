@@ -2,10 +2,7 @@ const mongoose = require('mongoose');
 const validator = require('validator');
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
-// var session = require('express-session');
-// const passport = require('passport');
-const passportLocalMongoose = require('passport-local-mongoose');
-// const { serializeUser } = require('passport');
+
 
 const regSchema = new mongoose.Schema({
     firstname: {
@@ -55,7 +52,7 @@ regSchema.methods.generateAuthToken = async function(){
     }catch(error){
         res.send("the error "+ error);
     }
-}
+};
 // password hashing
 regSchema.pre("save", async function (next) {
     // const passwordHash = await bcrypt.hash(password, 10);
@@ -63,10 +60,7 @@ regSchema.pre("save", async function (next) {
         this.password = await bcrypt.hash(this.password, 10);
     }
     next();
-})
-regSchema.plugin(passportLocalMongoose);
+});
+
 const Reg = new mongoose.model("Reg", regSchema);
-// passport.use(Reg.createStrategy());
-// passport.serializeUser(Reg.serializeUser);
-// passport.deserializeUser(Reg.deserializeUser);
 module.exports = Reg;
