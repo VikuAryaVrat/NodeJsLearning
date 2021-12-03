@@ -11,14 +11,13 @@ const forgetPass = async (req, res) => {
         const password = req.body.password;
         const updateData = await Student.findOneAndUpdate({ email: email1 }, { $set: { password: password } }, { new: true, useFindAndModify: true });
         if (!updateData) {
-            return res.send(fail("Error", "Email Not found", 501));
+            return res.send(fail("Email Not found"));
         } else {
             console.log(updateData);
-            res.send(success("Success", "Password Changed", 500));
-            // res.status(200).send(updateData);
+            res.send(success("Password Changed"));
         }
     } catch (err) {
-        res.status(400).send("something error");
+        res.status(400).send("Something Error");
     }
 }
 

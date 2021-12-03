@@ -9,9 +9,9 @@ const register = async(req,res) =>{
         const email3 = req.body.email;
         const mobile1 = req.body.mobile;
         if (await Student.findOne({ email: email3 })) {
-            res.send(fail("Error","Email Already exist", 402));
+            res.send(fail("Email Already exist"));
         } else if (await Student.findOne({ mobile: mobile1 })) {
-            res.send(fail("Error","Mobile number Already exist", 403));
+            res.send(fail("Mobile number Already exist"));
         } else {
             try {
                 const st1 = new Student({
@@ -22,13 +22,13 @@ const register = async(req,res) =>{
                 });
                 const createSt = await st1.save();
                 console.log(createSt);
-                res.send(success("Success","Registration Successful", 200));
+                res.send(success("Registration Successfull..!!", st1));
             } catch (error) {
-                res.send(fail("Error","Registration not Successful", 400));
+                res.send(fail("Registration not Successfull..!!"));
             }
         }
     } catch (error) {
-        res.send(fail("Error","Not Success", 401));
+        res.send(fail("Technical Error"));
     }
 }
 

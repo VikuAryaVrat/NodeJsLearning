@@ -14,15 +14,14 @@ const login = async(req,res) =>{
             if (userlogin.password === password) {
                 
                 console.log("Login1");
-                res.send(success("Success","Login Successful", 201));
+                res.send(success("Login Successful", userlogin));
                 console.log("Login2");
             } else {
                 console.log(userlogin);
-                res.send(success("Error","Login not Successful", 406));
-                // res.status(400).send(login);
+                res.send(fail("Invalid Email and password..!!!"));
             }
         } catch (err) {
-            res.send(fail("Error","Someting error", 405));
+            res.send(fail("Login not successful..!!!"));
         }
 }
 

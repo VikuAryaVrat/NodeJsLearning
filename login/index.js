@@ -4,36 +4,29 @@ const path = require('path');
 const hbs = require('hbs');
 const bcrypt = require('bcryptjs');
 const bodyParser = require("body-parser");
-var jwt = require('jsonwebtoken');
+const jwt = require('jsonwebtoken');
+const cookieParsar = require("cookie-parser");
+const auth = require("./auth");
 
 const port = process.env.PORT || 4000;
 require("./db/conn");
 const Reg = require("./model/std");
-// var session = require('express-session');
-// const passport = require('passport');
-// const passportLocalMongoose = require('passport-local-mongoose');
 
 const app = express();
+
 
 
 const publicPath = path.join(__dirname, "./public");
 const partials_path = path.join(__dirname, "/views/partials");
 console.log(process.env.SECRTE_KEY);
 app.use(express.json());
+app.use(cookieParsar());
 app.use(bodyParser.urlencoded({ extended: true }));
-// app.use(session({
-//     secret: 'HelloGuyZ',
-//     resave: false,
-//     saveUninitialized: true,
-//     // cookie: { secure: true }
-// }));
-// app.use(passport.initialize());
-// app.use(passport.session());
+
 
 
 
 app.use(express.static(publicPath));
-
 app.set("view engine", "hbs");
 hbs.registerPartials(partials_path);
 
@@ -49,6 +42,10 @@ app.get("/register", (req, res) => {
 app.get("/forgot",(req,res)=>{
     res.render("forgot");
 });
+app.get("/secret", auth, (req,res)=>{
+    res.render("secret");
+    // console.log(req.cookies.jwt);
+})
 app.post("/register", async (req, res) => {
     try {
         const reg1 = new Reg({
@@ -62,7 +59,11 @@ console.log();
      const token =await reg1.generateAuthToken();
      console.log("token part" + token);
 
-        // password hasing using bcrypt
+        // cookies
+        res.cookie("jwt", token,{
+                expires: new Date(Date.now() + 30000),
+                httpOnly: true
+        });
         const reg = await reg1.save();
         console.log(reg);
         res.render("home");
@@ -83,7 +84,14 @@ app.post("/login", async (req, res) => {
 
         const token =await userlogin.generateAuthToken();
         console.log("token part" + token);
-
+        
+        // cookies
+         res.cookie("jwt", token, {
+            expires: new Date(Date.now() + 300000),
+            // secure:true,
+            httpOnly: true
+    });
+    
         console.log(isMatch);
         if (isMatch) {
             res.status(202).render("home");
