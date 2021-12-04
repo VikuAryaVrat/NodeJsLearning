@@ -11,6 +11,7 @@ const auth = require("./auth");
 const port = process.env.PORT || 4000;
 require("./db/conn");
 const Reg = require("./model/std");
+const main = require("./mailer");
 
 const app = express();
 
@@ -119,22 +120,47 @@ app.get("/logout", auth, async (req, res) => {
         res.status(500).send(error);
     }
 });
+app.get("/otp", (req, res) => {
+    res.render("otp");
+})
+var otp_message;
+app.post("/otp",async(req, res) => {
+    try {
+        const email1 = req.body.email;
+        if (data = await Reg.findOne({ email: email1 })) {
+
+            otp_message = Math.floor((Math.random() * 9999) + 1000);
+
+            (main(email1, "OTP", otp_message));
+            res.render("forgot");
+
+        } else {
+            res.send("invalid")
+        }
+    } catch (error) {
+
+    }
+})
 app.post("/forgot", async (req, res) => {
     try {
         console.log(req.body);
         const email1 = req.body.email;
         const password = req.body.password;
+        const otp = req.body.otp;
         console.log("salo");
-        const passwordHash = await bcrypt.hash(password, 10);
-        console.log("bye");
-        const updateData = await Reg.findOneAndUpdate({ email: email1 }, { $set: { password: passwordHash } }, { new: true, useFindAndModify: true });
-        console.log("hi");
-        if (!updateData) {
-            return res.status(404).send();
+        if (`${otp_message}` === otp) {
+            const passwordHash = await bcrypt.hash(password, 10);
+            const updateData = await Reg.findOneAndUpdate({ email: email1 }, { $set: { password: passwordHash } }, { new: true, useFindAndModify: true });
+            if (!updateData) {
+                return res.status(404).send();
+            } else {
+                console.log(updateData);
+                res.status(200).send("Password successfully changed");
+            }
         } else {
-            console.log(updateData);
-            res.status(200).send("Password successfully changed");
+            res.render("forgot");
         }
+
     } catch (err) {
         res.status(400).send(err);
     }

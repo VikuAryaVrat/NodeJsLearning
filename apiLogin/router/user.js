@@ -4,16 +4,22 @@ const router = new express.Router();
 const Student = require("../models/students");
 const register = require("../controller/user_cont");
 const login = require("../controller/login_cont");
-const forgetPass = require("../controller/forget_cont");
+const {Otp,forgetPass} = require("../controller/forget_cont");
+const main = require("../mailer");
+
+
 
 // registration
 router.post("/students",register);
 
 // login
 router.post("/login",login);
-
+router.post("/otp", Otp);
 // Password updation querry
-router.patch("/forget",forgetPass);
+router.post("/forget",forgetPass);
+
+
+
 
 
 // get data from database
