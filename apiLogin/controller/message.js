@@ -1,17 +1,17 @@
 message = module.exports;
 
-message.success = (mesg,data) =>{
+message.success = (message,data) =>{
     return {
-             status: "Success",
-             mesg: mesg,
+             status: "success",
+             message: message,
              data: data || []
             }
 }
 
-message.fail = (mesg) =>{
+message.fail = (message) =>{
     return {
-             status: "Error",
-             mesg: mesg,
+             status: "error",
+             message: message,
              data: []
             }
 }

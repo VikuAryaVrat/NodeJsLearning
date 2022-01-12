@@ -6,14 +6,22 @@ const register = require("../controller/user_cont");
 const login = require("../controller/login_cont");
 const {Otp,forgetPass} = require("../controller/forget_cont");
 const main = require("../mailer");
+const cookieParsar = require("cookie-parser");
+const session = require('express-session');
+const setPass = require('../controller/setPassword');
+const randomData = require('../controller/data');
 
 
 
 // registration
-router.post("/students",register);
+router.post("/user/signup-via-email",register);
 
+// password set
+router.post("/user/confirm-registration", setPass);
+router.get("/randomdata", randomData);
 // login
-router.post("/login",login);
+router.post("/user/login",login);
+// otp send querry 
 router.post("/otp", Otp);
 // Password updation querry
 router.post("/forget",forgetPass);

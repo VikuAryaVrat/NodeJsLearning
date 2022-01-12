@@ -20,7 +20,6 @@ const Otp = async (req, res) => {
         if(data = await Student.findOne({ email: email1 })) {
             console.log("ajawo");
             otp_message = Math.floor((Math.random() * 9999) + 1000);
-
             (main(email1, "OTP", otp_message));
             res.send(success("Otp Send Successfully..!!!"));
         } else {
@@ -44,7 +43,7 @@ const forgetPass = async (req, res) => {
                 return res.send(fail("Email Not found"));
             } else {
                 console.log(updateData);
-                res.send(success("Password Changed"));
+                res.send(success("Password Changed",updateData));
             }
         } else {
             res.send(fail("Password not changed"));

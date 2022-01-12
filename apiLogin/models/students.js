@@ -1,19 +1,21 @@
 const mongoose = require('mongoose');
 const validator = require('validator');
+const jwt = require("jsonwebtoken");
+const session = require("express-session");
 
 
 const studentSchema = new mongoose.Schema({
-    username: {
-        type: String,
-        required: true,
-        // minlength: [3, "Length shoulds be greater than 3 char"],
-        // maxlength: [30, "Inviled"],
-        // lowercase: true,
-        // trim:true
-    },
+    // username: {
+    //     type: String,
+    //     // required: true,
+    //     // minlength: [3, "Length shoulds be greater than 3 char"],
+    //     // maxlength: [30, "Inviled"],
+    //     // lowercase: true,
+    //     // trim:true
+    // },
     email: {
         type: String,
-        required: true,
+        // required: true,
         unique: true,
         // sparse:true,
         // lowercase:true,
@@ -30,23 +32,41 @@ const studentSchema = new mongoose.Schema({
         // minlength:[10,"Minimum length is 10 digit"],
         // maxlength:[10,"Maximum length is 10 digit"],
         // trim:true,
-        unique:true,
-        required: true
+        // unique:true,
+        // required: true
         // match: /^[6-9]\d{9}$/,
     },
     password:{
          type: String,
-        required:true,
+        // required:true,
         trim:true,
         // match: /^(?=.*[0-9])(?=.*[!@#$%^&*])[a-zA-Z0-9!@#$%^&*]{6,60}$/
     },
+    tokens:[{
+        token:{
+            type:String,
+            required:true
+        }
+ }],
     date:{
         type: Date,
         default: Date.now
     }
 });
 
+studentSchema.methods.generateAuthToken = async function(){
+    try{
+       const token = jwt.sign({_id:this._id.toString()}, process.env.SECRTE_KEY);
+       this.tokens = this.tokens.concat({token:token});
 
+        await this.save();
+       return token;
+       var session = req.session;
+       session.token = token;
+    }catch(error){
+        res.send("the error "+ error);
+    }
+};
 
 const Student = new mongoose.model('Student',studentSchema);
 
